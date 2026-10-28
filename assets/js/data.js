@@ -239,22 +239,117 @@
     return modelo;
   }
 
-  /* ---------- 4) buscar na API ---------- */
-  async function buscar(cfg) {
+  /* ---------- 4) buscar os dados (várias fontes, com reserva) ---------- */
+  async function obter(url, cfg, tipo) {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), cfg.TIMEOUT_MS);
     try {
-      // GET simples, sem cabeçalhos extras: evita preflight de CORS no Apps Script
-      const sep = cfg.API_URL.includes("?") ? "&" : "?";
-      const resp = await fetch(`${cfg.API_URL}${sep}_=${Date.now()}`, { signal: ctrl.signal, redirect: "follow", cache: "no-store" });
+      // GET simples, sem cabeçalhos extras: evita preflight de CORS
+      const sep = url.includes("?") ? "&" : "?";
+      const resp = await fetch(`${url}${sep}_=${Date.now()}`, { signal: ctrl.signal, redirect: "follow", cache: "no-store" });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const txt = await resp.text();
-      let json;
-      try { json = JSON.parse(txt); } catch { throw new Error("a resposta não é JSON (verifique se o script está publicado para 'Qualquer pessoa')"); }
-      return json;
+      return tipo === "bin" ? await resp.arrayBuffer() : await resp.text();
+    } catch (e) {
+      if (e.name === "AbortError") throw new Error("tempo esgotado");
+      if (e instanceof TypeError) throw new Error("bloqueado pelo navegador (CORS) ou sem conexão");
+      throw e;
     } finally {
       clearTimeout(t);
     }
+  }
+
+  let xlsxPromessa = null;
+  function carregarXLSX(cfg) {
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    if (!xlsxPromessa) {
+      xlsxPromessa = new Promise((ok, erro) => {
+        const s = document.createElement("script");
+        s.src = cfg.XLSX_LIB_URL;
+        s.onload = () => (window.XLSX ? ok(window.XLSX) : erro(new Error("leitor de planilha não carregou")));
+        s.onerror = () => { xlsxPromessa = null; erro(new Error("não foi possível carregar o leitor de planilha")); };
+        document.head.appendChild(s);
+      });
+    }
+    return xlsxPromessa;
+  }
+
+  /** Converte um arquivo de planilha (xlsx/csv) em { aba: [linhas] }. */
+  function livroParaJson(XLSX, wb) {
+    const out = {};
+    wb.SheetNames.forEach((n) => { out[n] = XLSX.utils.sheet_to_json(wb.Sheets[n], { defval: "", raw: true }); });
+    return out;
+  }
+
+  function urlPublicada(cfg, formato) {
+    const base = String(cfg.PLANILHA_PUBLICADA_URL || "").replace(/\/pub(html)?(\?.*)?$/, "");
+    if (!base) return "";
+    return `${base}/pub?output=${formato}`;
+  }
+
+  const FONTES = {
+    async planilha_publicada(cfg) {
+      const url = urlPublicada(cfg, "xlsx");
+      if (!url) throw new Error("PLANILHA_PUBLICADA_URL vazia");
+      const [XLSX, buf] = await Promise.all([carregarXLSX(cfg), obter(url, cfg, "bin")]);
+      const head = new Uint8Array(buf.slice(0, 2));
+      if (!(head[0] === 0x50 && head[1] === 0x4b)) throw new Error("o Google não devolveu um .xlsx (a planilha está publicada na Web?)");
+      return livroParaJson(XLSX, XLSX.read(buf, { type: "array" }));
+    },
+    async planilha_gviz(cfg) {
+      if (!cfg.PLANILHA_ID) throw new Error("PLANILHA_ID não configurado");
+      const XLSX = await carregarXLSX(cfg);
+      const out = {};
+      const erros = [];
+      await Promise.all((cfg.ABAS || []).map(async (aba) => {
+        try {
+          const csv = await obter(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(cfg.PLANILHA_ID)}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(aba)}`, cfg, "txt");
+          if (/^\s*</.test(csv)) throw new Error("resposta em HTML (compartilhe a planilha: qualquer pessoa com o link pode ver)");
+          const wb = XLSX.read(csv, { type: "string", raw: false });
+          out[aba] = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
+        } catch (e) { erros.push(`${aba}: ${e.message}`); }
+      }));
+      if (!Object.keys(out).length) throw new Error(erros.join("; ") || "nenhuma aba lida");
+      return out;
+    },
+    async apps_script(cfg) {
+      if (!cfg.API_URL) throw new Error("API_URL vazia");
+      const txt = await obter(cfg.API_URL, cfg, "txt");
+      try { return JSON.parse(txt); } catch {
+        throw new Error(/<html|<!doctype/i.test(txt)
+          ? "o script devolveu uma página HTML, não JSON (implantação precisa ser 'Qualquer pessoa')"
+          : "a resposta não é JSON");
+      }
+    },
+    async json_local(cfg) {
+      const txt = await obter(cfg.JSON_LOCAL_URL, cfg, "txt");
+      return JSON.parse(txt);
+    },
+  };
+  const NOMES_FONTE = {
+    planilha_publicada: "planilha publicada (Google Sheets)",
+    planilha_gviz: "Google Sheets (consulta por aba)",
+    apps_script: "API do Apps Script",
+    json_local: "arquivo do repositório (data/dados.json)",
+  };
+
+  /** Tenta as fontes na ordem configurada. Devolve { modelo, fonte, nome, json, tentativas }. */
+  async function buscar(cfg) {
+    const tentativas = [];
+    for (const f of cfg.FONTES || ["apps_script"]) {
+      if (!FONTES[f]) { tentativas.push({ fonte: f, erro: "fonte desconhecida" }); continue; }
+      try {
+        const json = await FONTES[f](cfg);
+        const modelo = interpretar(json, cfg);
+        tentativas.push({ fonte: f, ok: true });
+        return { modelo, fonte: f, nome: NOMES_FONTE[f], json, tentativas };
+      } catch (e) {
+        console.warn(`[painel] fonte "${f}" falhou:`, e);
+        tentativas.push({ fonte: f, nome: NOMES_FONTE[f], erro: e.message || String(e) });
+      }
+    }
+    const err = new Error("nenhuma fonte de dados respondeu");
+    err.tentativas = tentativas;
+    throw err;
   }
 
   function interpretar(json, cfg) {
@@ -264,5 +359,5 @@
     return montarModelo(cls, cfg);
   }
 
-  window.DadosPainel = { buscar, interpretar, avaliar, faixaRisco, numero, chave };
+  window.DadosPainel = { buscar, interpretar, avaliar, faixaRisco, numero, chave, NOMES_FONTE };
 })();

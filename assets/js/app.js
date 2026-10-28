@@ -426,30 +426,46 @@
     b.innerHTML = html || "";
   }
 
+  function listaTentativas(ts) {
+    return `<ul class="diag">${(ts || []).map((x) =>
+      `<li>${x.ok ? "✔" : "✖"} <b>${esc(x.nome || x.fonte)}</b>${x.ok ? " — funcionou" : ` — ${esc(x.erro)}`}</li>`).join("")}</ul>`;
+  }
+
   async function carregar(manual) {
     if (state.carregando) return;
     state.carregando = true;
-    status(manual ? "Atualizando…" : state.modelo ? "Atualizando…" : "Carregando dados da planilha…");
+    status(state.modelo ? "Atualizando…" : "Carregando dados da planilha…");
     try {
-      const json = await D.buscar(CFG);
-      state.modelo = D.interpretar(json, CFG);
-      state.origem = "api";
+      const r = await D.buscar(CFG);
+      state.modelo = r.modelo;
+      state.origem = r.fonte;
+      state.tentativas = r.tentativas;
       state.ultimaAtualizacao = new Date();
-      banner("");
-      status(`Dados da planilha · atualizado às ${state.ultimaAtualizacao.toLocaleTimeString("pt-BR")}`, "on");
+      const hora = state.ultimaAtualizacao.toLocaleTimeString("pt-BR");
+      if (r.fonte === "json_local") {
+        const quando = r.json && r.json.atualizadoEm ? new Date(r.json.atualizadoEm) : null;
+        const qtxt = quando && !isNaN(quando) ? quando.toLocaleString("pt-BR") : "data não informada";
+        banner(`Lendo a cópia da planilha salva no repositório (gerada em ${esc(qtxt)}). As fontes ao vivo não responderam.
+          <details><summary>Ver diagnóstico</summary>${listaTentativas(r.tentativas)}</details>`, "warn");
+        status(`Arquivo do repositório · lido às ${hora}`, "on");
+      } else {
+        banner("");
+        status(`${r.nome[0].toUpperCase() + r.nome.slice(1)} · atualizado às ${hora}`, "on");
+      }
     } catch (err) {
-      const motivo = err.name === "AbortError" ? "a API demorou demais para responder" : err.message || String(err);
-      console.error("[painel] falha ao ler a API:", err);
-      if (state.modelo && state.origem === "api") {
-        banner(`Não foi possível atualizar agora (${esc(motivo)}). Exibindo a última leitura da planilha.`, "warn");
+      console.error("[painel] nenhuma fonte respondeu:", err);
+      state.tentativas = err.tentativas || [{ fonte: "?", erro: err.message || String(err) }];
+      const diag = `<details open><summary>Diagnóstico das fontes</summary>${listaTentativas(state.tentativas)}</details>`;
+      if (state.modelo && state.origem !== "exemplo") {
+        banner(`Não foi possível atualizar agora. Exibindo a última leitura (${state.ultimaAtualizacao.toLocaleTimeString("pt-BR")}).${diag}`, "warn");
         status(`Última leitura às ${state.ultimaAtualizacao.toLocaleTimeString("pt-BR")} · falha na atualização`, "err");
       } else if (CFG.USAR_EXEMPLO_SE_FALHAR && window.DADOS_EXEMPLO) {
         state.modelo = D.interpretar(window.DADOS_EXEMPLO, CFG);
         state.origem = "exemplo";
-        banner(`<b>API indisponível</b> (${esc(motivo)}). Exibindo <b>dados de exemplo</b> salvos no site (cópia da planilha de 27/10/2026) — não são os dados atuais.`, "warn");
-        status("Dados de exemplo · API indisponível", "err");
+        banner(`<b>Nenhuma fonte de dados respondeu.</b> Exibindo <b>dados de exemplo</b> salvos no site (cópia da planilha de 27/10/2026) — não são os dados atuais.${diag}`, "warn");
+        status("Dados de exemplo · fontes indisponíveis", "err");
       } else {
-        banner(`<b>Não foi possível carregar a planilha</b> (${esc(motivo)}).`, "err");
+        banner(`<b>Não foi possível carregar a planilha.</b>${diag}`, "err");
         status("Sem dados", "err");
       }
     } finally {
@@ -497,7 +513,8 @@
   // configurações e ajuda
   $("#btnConfig").addEventListener("click", (e) => {
     e.preventDefault();
-    $("#cfgApi").value = CFG.API_URL;
+    $("#cfgApi").value = (CFG.FONTES || []).join(" → ");
+    $("#cfgDiag").innerHTML = state.tentativas ? listaTentativas(state.tentativas) : "Ainda não carregou.";
     $("#cfgIntervalo").value = String(state.intervalo);
     $("#cfgTema").value = document.documentElement.dataset.theme;
     $("#dlgConfig").showModal();

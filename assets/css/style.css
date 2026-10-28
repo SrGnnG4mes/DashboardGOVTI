@@ -265,6 +265,11 @@ details[open] summary h2::before { transform: rotate(90deg); }
 
 .footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 11.5px; padding-top: 6px; }
 
+.diag { margin: 6px 0 0; padding-left: 4px; list-style: none; font-size: 12.5px; }
+.diag li { margin: 3px 0; }
+.banner details { margin-top: 6px; } .banner summary { cursor: pointer; color: var(--accent-2); font-weight: 600; }
+.diag-box { color: var(--txt-2); font-size: 12.5px; background: var(--card-2); border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 10px; }
+
 /* Tooltip */
 .tooltip { position: fixed; z-index: 100; pointer-events: none; max-width: 300px; background: #0b1324; color: #e7ecf5; border: 1px solid #2a3c62; border-radius: 9px; padding: 8px 10px; font-size: 12px; box-shadow: 0 10px 28px rgba(0,0,0,.4); }
 :root[data-theme="light"] .tooltip { background: #fff; color: #172033; border-color: #d3dbe8; }

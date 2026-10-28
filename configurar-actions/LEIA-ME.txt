@@ -1,0 +1,13 @@
+O GitHub só executa workflows que estão na pasta .github/workflows.
+
+Mova o arquivo atualizar-dados.yml desta pasta para:
+    .github/workflows/atualizar-dados.yml
+
+Jeitos de fazer:
+  - No Explorador de Arquivos: crie as pastas ".github" e, dentro dela, "workflows" na raiz do repositório
+    (DashboardGOVTI) e mova o arquivo para lá. Depois faça o commit no GitHub Desktop.
+  - Ou no site do GitHub: Add file > Create new file > nome ".github/workflows/atualizar-dados.yml",
+    cole o conteúdo do arquivo e clique em Commit changes.
+
+Depois: Settings > Actions > General > Workflow permissions > "Read and write permissions" > Save,
+e na aba Actions rode "Atualizar dados da planilha" > Run workflow.

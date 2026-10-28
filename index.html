@@ -165,7 +165,8 @@
 <dialog class="modal" id="dlgConfig">
   <form method="dialog">
     <h3>Configurações</h3>
-    <label class="fld">Fonte de dados (API)<input id="cfgApi" readonly></label>
+    <label class="fld">Ordem das fontes de dados<input id="cfgApi" readonly></label>
+    <div class="fld">Última tentativa<div id="cfgDiag" class="diag-box"></div></div>
     <label class="fld">Atualização automática
       <select id="cfgIntervalo">
         <option value="0">Desligada</option><option value="30">A cada 30 s</option>
@@ -175,7 +176,7 @@
     <label class="fld">Tema
       <select id="cfgTema"><option value="dark">Escuro</option><option value="light">Claro</option></select>
     </label>
-    <p class="hint">A URL da API é definida em <code>assets/js/config.js</code>.</p>
+    <p class="hint">As fontes e os links ficam em <code>assets/js/config.js</code>.</p>
     <div class="modal-actions"><button class="btn-primary" value="ok">Fechar</button></div>
   </form>
 </dialog>

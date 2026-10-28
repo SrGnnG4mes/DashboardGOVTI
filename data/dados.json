@@ -1,0 +1,267 @@
+{
+ "fonte": "exemplo (cópia da planilha de 27/10/2026)",
+ "abas": {
+  "dIndicadores": [
+   {
+    "ID": "IND01",
+    "Indicador": "Disponibilidade mensal do portal",
+    "Unidade": "%",
+    "Formato": "pct",
+    "Meta": 99,
+    "Meta_Texto": "≥ 99,0%",
+    "Sentido": "Maior",
+    "Fonte": "Ferramenta de monitoramento do portal e registros de incidentes",
+    "Responsavel": "Gestor de TI",
+    "Artefatos": "PDTI O1/I1 · SLA do portal · Matriz de riscos",
+    "Indice_Risco_Associado": 16,
+    "Risco_Associado": "Indisponibilidade do portal",
+    "Evidencia_a_Validar": "Relatório de monitoramento do mês e duração exata de cada interrupção",
+    "Ordem_Exibicao": 1
+   },
+   {
+    "ID": "IND02",
+    "Indicador": "Chamados por lentidão do prontuário",
+    "Unidade": "chamados / 20 dias úteis",
+    "Formato": "num",
+    "Meta": 29,
+    "Meta_Texto": "≤ 29 até o 6º mês (−80%)",
+    "Sentido": "Menor",
+    "Fonte": "Sistema ou registros da central de suporte de TI",
+    "Responsavel": "Coordenador de Sistemas e Infraestrutura",
+    "Artefatos": "PDTI O2/I2 · Matriz de riscos",
+    "Indice_Risco_Associado": 20,
+    "Risco_Associado": "Lentidão do prontuário",
+    "Evidencia_a_Validar": "Extração do sistema de chamados com a classificação \"lentidão\" e o período",
+    "Ordem_Exibicao": 2
+   },
+   {
+    "ID": "IND03",
+    "Indicador": "Testes de restauração realizados",
+    "Unidade": "% dos previstos",
+    "Formato": "pct",
+    "Meta": 100,
+    "Meta_Texto": "100% dos testes mensais",
+    "Sentido": "Maior",
+    "Fonte": "Registros da ferramenta de backup e relatórios de teste",
+    "Responsavel": "Coordenação de TI",
+    "Artefatos": "PDTI O3/I3 · DRP · PSI (backup) · Matriz de riscos",
+    "Indice_Risco_Associado": 15,
+    "Risco_Associado": "Perda de dados por falha no backup",
+    "Evidencia_a_Validar": "Calendário de testes previstos e relatório de cada teste executado",
+    "Ordem_Exibicao": 3
+   },
+   {
+    "ID": "IND04",
+    "Indicador": "Tempo de recuperação do portal em teste",
+    "Unidade": "horas",
+    "Formato": "horas",
+    "Meta": 4,
+    "Meta_Texto": "≤ 4 h (diretriz do PDTI)",
+    "Sentido": "Menor",
+    "Fonte": "Relatório de teste do plano de recuperação (DRP)",
+    "Responsavel": "Gestão de TI",
+    "Artefatos": "DRP · SLA do portal · PDTI I1",
+    "Indice_Risco_Associado": 16,
+    "Risco_Associado": "Indisponibilidade do portal",
+    "Evidencia_a_Validar": "Primeiro teste de recuperação com início, fim e validação do serviço",
+    "Ordem_Exibicao": 4
+   },
+   {
+    "ID": "IND05",
+    "Indicador": "Chamados críticos atendidos no prazo",
+    "Unidade": "%",
+    "Formato": "pct",
+    "Meta": 90,
+    "Meta_Texto": "≥ 90%",
+    "Sentido": "Maior",
+    "Fonte": "Service Desk e SLA",
+    "Responsavel": "Gestor de TI",
+    "Artefatos": "SLA · Catálogo de serviços",
+    "Indice_Risco_Associado": "",
+    "Risco_Associado": "",
+    "Evidencia_a_Validar": "Relatório de chamados com tempos, fila e causas dos atrasos",
+    "Ordem_Exibicao": 5
+   },
+   {
+    "ID": "IND06",
+    "Indicador": "Escalonamentos analisados no prazo (infraestrutura)",
+    "Unidade": "%",
+    "Formato": "pct",
+    "Meta": 95,
+    "Meta_Texto": "≥ 95%",
+    "Sentido": "Maior",
+    "Fonte": "Registros de escalonamento entre Service Desk e infraestrutura",
+    "Responsavel": "Gestor de TI",
+    "Artefatos": "OLA · SLA",
+    "Indice_Risco_Associado": "",
+    "Risco_Associado": "",
+    "Evidencia_a_Validar": "Registros com data e hora de recebimento e de início da análise",
+    "Ordem_Exibicao": 6
+   },
+   {
+    "ID": "IND07",
+    "Indicador": "Revisões de acesso ao prontuário e aos backups",
+    "Unidade": "% das previstas",
+    "Formato": "pct",
+    "Meta": 100,
+    "Meta_Texto": "100% das revisões previstas",
+    "Sentido": "Maior",
+    "Fonte": "Relação de permissões e registros de revisão",
+    "Responsavel": "Gestão de TI",
+    "Artefatos": "PSI (controle de acesso) · PDTI P4",
+    "Indice_Risco_Associado": "",
+    "Risco_Associado": "Acesso indevido (R8, qualitativo no PDTI)",
+    "Evidencia_a_Validar": "PSI aprovada, periodicidade definida e registro da primeira revisão",
+    "Ordem_Exibicao": 7
+   },
+   {
+    "ID": "IND08",
+    "Indicador": "Taxa de falha de mudanças no prontuário (DORA)",
+    "Unidade": "% das mudanças",
+    "Formato": "pct",
+    "Meta": 15,
+    "Meta_Texto": "≤ 15% (proposta do grupo, a validar)",
+    "Sentido": "Menor",
+    "Fonte": "Registro de mudanças da Equipe de Sistemas e Infraestrutura",
+    "Responsavel": "Coordenador de Sistemas e Infraestrutura",
+    "Artefatos": "DORA · PDTI I2 · Matriz de riscos",
+    "Indice_Risco_Associado": "",
+    "Risco_Associado": "Mudança corretiva gerar nova degradação (R4)",
+    "Evidencia_a_Validar": "Registro de cada mudança com resultado (sucesso, reversão ou correção posterior)",
+    "Ordem_Exibicao": 8
+   }
+  ],
+  "fMedicoes": [
+   {
+    "ID": "IND01",
+    "Periodo": "M0 - Linha de base",
+    "Ordem_Periodo": 0,
+    "Valor": 97.4,
+    "Origem_Dado": "Derivado da linha de base do PDTI: 19 h de indisponibilidade em um mês (cálculo sobre 720 h)"
+   },
+   {
+    "ID": "IND02",
+    "Periodo": "M0 - Linha de base",
+    "Ordem_Periodo": 0,
+    "Valor": 146,
+    "Origem_Dado": "Linha de base do PDTI (146 chamados em 20 dias úteis)"
+   },
+   {
+    "ID": "IND03",
+    "Periodo": "M0 - Linha de base",
+    "Ordem_Periodo": 0,
+    "Valor": 0,
+    "Origem_Dado": "Linha de base do PDTI: nenhum teste no período; o último ocorreu há 11 meses"
+   },
+   {
+    "ID": "IND04",
+    "Periodo": "M0 - Linha de base",
+    "Ordem_Periodo": 0,
+    "Valor": "",
+    "Origem_Dado": "Sem medição: nenhum teste de recuperação registrado"
+   },
+   {
+    "ID": "IND05",
+    "Periodo": "M0 - Linha de base",
+    "Ordem_Periodo": 0,
+    "Valor": 72,
+    "Origem_Dado": "Dado simulado da aula de 22/10 — a validar com o relatório real"
+   },
+   {
+    "ID": "IND06",
+    "Periodo": "M0 - Linha de base",
+    "Ordem_Periodo": 0,
+    "Valor": 81,
+    "Origem_Dado": "Dado simulado da aula de 22/10 — a validar"
+   },
+   {
+    "ID": "IND07",
+    "Periodo": "M0 - Linha de base",
+    "Ordem_Periodo": 0,
+    "Valor": "",
+    "Origem_Dado": "Sem medição: a PSI ainda é minuta e a periodicidade não foi aprovada"
+   },
+   {
+    "ID": "IND08",
+    "Periodo": "M0 - Linha de base",
+    "Ordem_Periodo": 0,
+    "Valor": "",
+    "Origem_Dado": "Sem linha de base: as correções do prontuário estão previstas para M3–M4"
+   }
+  ],
+  "dRiscos": [
+   {
+    "ID_Risco": "RSK01",
+    "Risco": "Indisponibilidade do portal",
+    "Risco_Curto": "Portal",
+    "Probabilidade": 4,
+    "Impacto": 4,
+    "Indice": 16,
+    "Faixa": "Alto",
+    "Tratamento": "SLA formal, monitoramento e plano de recuperação (I1)",
+    "Responsavel": "Gestão de TI"
+   },
+   {
+    "ID_Risco": "RSK02",
+    "Risco": "Lentidão do prontuário",
+    "Risco_Curto": "Prontuário",
+    "Probabilidade": 5,
+    "Impacto": 4,
+    "Indice": 20,
+    "Faixa": "Crítico",
+    "Tratamento": "Diagnóstico técnico antes das correções (I2)",
+    "Responsavel": "Equipe de Sistemas e Infraestrutura"
+   },
+   {
+    "ID_Risco": "RSK03",
+    "Risco": "Perda de dados por falha no backup",
+    "Risco_Curto": "Backup",
+    "Probabilidade": 3,
+    "Impacto": 5,
+    "Indice": 15,
+    "Faixa": "Alto",
+    "Tratamento": "Automação e testes mensais de restauração (I3)",
+    "Responsavel": "Equipe de Infraestrutura de TI"
+   }
+  ],
+  "dDecisoes": [
+   {
+    "ID": "D1",
+    "Decisao": "Formalizar o SLA e o plano de recuperação do portal",
+    "Gatilho": "Disponibilidade ≈ 97,4% (meta ≥ 99%) e nenhum teste de recuperação registrado (meta ≤ 4 h).",
+    "Artefatos": "PDTI I1 · SLA · DRP · Matriz de riscos",
+    "Responsavel": "Gestão de TI executa; direção aprova o SLA",
+    "Prazo": "SLA até M2; procedimentos até M3 (cronograma do PDTI); primeiro teste: a definir",
+    "Evidencia_Esperada": "SLA assinado; relatório de teste com tempo medido e validação do serviço"
+   },
+   {
+    "ID": "D2",
+    "Decisao": "Autorizar o diagnóstico técnico do prontuário antes de qualquer correção ou compra",
+    "Gatilho": "146 chamados em 20 dias úteis (meta ≤ 29) e risco crítico (índice 20).",
+    "Artefatos": "PDTI I2 · Matriz de riscos · DORA",
+    "Responsavel": "Equipe de Sistemas e Infraestrutura",
+    "Prazo": "Diagnóstico em M1–M2; correções em M3–M4",
+    "Evidencia_Esperada": "Relatório de diagnóstico; plano de tratamento aprovado; taxa de falha de mudanças a partir de M3"
+   },
+   {
+    "ID": "D3",
+    "Decisao": "Determinar a automação do backup e o primeiro teste formal de restauração",
+    "Gatilho": "0% dos testes previstos; último teste há 11 meses; risco alto (índice 15).",
+    "Artefatos": "PDTI I3 · DRP · PSI · Matriz de riscos",
+    "Responsavel": "Equipe de Infraestrutura de TI",
+    "Prazo": "Rotina automatizada em M3; primeiro teste formal em M4",
+    "Evidencia_Esperada": "Relatório do teste: data, dados restaurados, resultado e falhas encontradas"
+   },
+   {
+    "ID": "D4",
+    "Decisao": "Aprovar a PSI, instituir o acompanhamento mensal do painel e investigar os desvios de SLA/OLA",
+    "Gatilho": "PSI em minuta; revisões de acesso sem medição; SLA em 72% e OLA em 81% (dados simulados).",
+    "Artefatos": "PSI · SLA · OLA",
+    "Responsavel": "Direção aprova; Gestão de TI consolida o relatório mensal e conduz a investigação",
+    "Prazo": "A definir pela direção",
+    "Evidencia_Esperada": "Ata de aprovação da PSI; relatório de investigação com fila, tempos, causas e escalonamentos"
+   }
+  ]
+ },
+ "atualizadoEm": "2026-10-27T18:00:00+00:00"
+}
