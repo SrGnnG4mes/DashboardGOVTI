@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Governança de TI · Boa Esperança</title>
+  <meta name="description" content="Painel de governança de TI da Prefeitura de Boa Esperança: indicadores, riscos e decisões, atualizado a partir da planilha do grupo.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar" aria-label="Navegação">
+    <div class="brand">
+      <span class="brand-ico" data-icon="building"></span>
+      <div>
+        <div class="brand-kicker">PREFEITURA DE</div>
+        <div class="brand-name" id="brandName">Boa Esperança</div>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <span class="dot"></span> Governança de TI
+    </div>
+
+    <nav class="nav">
+      <div class="nav-title">ACOMPANHAMENTO</div>
+      <a href="#" class="nav-item active" data-filtro="todos"><span data-icon="grid"></span>Visão geral</a>
+      <a href="#" class="nav-item" data-filtro="disponibilidade" data-alvo="secSerie"><span data-icon="activity"></span>Disponibilidade</a>
+      <a href="#" class="nav-item" data-filtro="servicedesk"><span data-icon="headset"></span>Service Desk</a>
+      <a href="#" class="nav-item" data-filtro="psi"><span data-icon="shield"></span>Segurança (PSI)</a>
+      <a href="#" class="nav-item" data-filtro="pdti" data-alvo="secDecisoes"><span data-icon="briefcase"></span>PDTI / Projetos</a>
+      <a href="#" class="nav-item" data-filtro="riscos" data-alvo="secMatriz"><span data-icon="bell"></span>Riscos e alertas<span class="badge" id="navBadge" hidden>0</span></a>
+
+      <div class="nav-title">PLANEJAMENTO</div>
+      <a href="#" class="nav-item" data-filtro="pdti" data-alvo="secDecisoes"><span data-icon="target"></span>PDTI 2026–2027</a>
+      <a href="#" class="nav-item" data-filtro="drp"><span data-icon="refresh"></span>DRP / Contingência</a>
+    </nav>
+
+    <div class="side-bottom">
+      <div class="proto-box">
+        <div class="proto-title"><span data-icon="info"></span>Protótipo experimental</div>
+        <div>Governança de TI · Dados hipotéticos · Não publicar</div>
+      </div>
+      <a href="#" class="nav-item" id="btnConfig"><span data-icon="sliders"></span>Configurações</a>
+      <a href="#" class="nav-item" id="btnAjuda"><span data-icon="help"></span>Central de ajuda</a>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ================= MAIN ================= -->
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="btnMenu" aria-label="Abrir menu"><span data-icon="menu"></span></button>
+      <div class="crumbs"><span>Governança de TI</span><span class="sep">/</span><b id="crumbAtual">Visão geral</b></div>
+      <div class="top-right">
+        <label class="search">
+          <span data-icon="search"></span>
+          <input id="busca" type="search" placeholder="Buscar no painel" autocomplete="off" aria-label="Buscar no painel">
+          <kbd>Ctrl K</kbd>
+        </label>
+        <div class="alert-wrap">
+          <button class="icon-btn" id="btnAlertas" aria-label="Alertas"><span data-icon="bell"></span><i class="pip" id="pipAlertas" hidden></i></button>
+          <div class="dropdown" id="dropAlertas" hidden></div>
+        </div>
+        <div class="user">
+          <span class="avatar">TI</span>
+          <div class="user-txt"><b id="userName">Coordenação de TI</b><small id="userSub">CSTSI6 · Gestão de TI</small></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content" id="conteudo">
+      <div class="page-head">
+        <div>
+          <h1>Governança de TI – Visão Geral</h1>
+          <p class="lead">Indicadores operacionais, riscos e decisões prioritárias da Coordenação de TI</p>
+        </div>
+        <div class="actions">
+          <label class="select">
+            <span data-icon="calendar"></span>
+            <select id="selPeriodo" aria-label="Período de referência"></select>
+          </label>
+          <button class="btn-primary" id="btnExportar"><span data-icon="download"></span>Exportar relatório</button>
+        </div>
+      </div>
+
+      <div class="notice-row">
+        <div class="notice"><span data-icon="alert"></span><span id="avisoDados">Protótipo experimental · Dados hipotéticos a validar · Não publicar · CSTSI6</span></div>
+        <div class="status-line">
+          <span class="live" id="liveDot"></span><span id="statusTxt">Carregando dados da planilha…</span>
+          <button class="link-btn" id="btnAtualizar"><span data-icon="refresh"></span>Atualizar</button>
+        </div>
+      </div>
+
+      <div class="banner" id="banner" hidden></div>
+      <div class="filter-chip" id="chipFiltro" hidden></div>
+
+      <!-- KPIs -->
+      <section class="kpis" id="kpis" aria-label="Indicadores"></section>
+
+      <!-- Série + atingimento -->
+      <section class="row r-2-1">
+        <article class="card" id="secSerie">
+          <div class="card-head">
+            <div>
+              <h2 id="serieTitulo">Série do indicador</h2>
+              <p class="sub" id="serieSub"></p>
+            </div>
+            <label class="select small"><select id="selSerie" aria-label="Indicador do gráfico"></select></label>
+          </div>
+          <div class="chart" id="chartSerie"></div>
+          <p class="foot" id="serieFoot"></p>
+        </article>
+        <article class="card" id="secAting">
+          <div class="card-head"><div><h2 id="atTitulo">Distância da meta por indicador</h2><p class="sub" id="atSub"></p></div></div>
+          <div id="listaAting" class="hbars"></div>
+          <p class="foot" id="atFoot"></p>
+        </article>
+      </section>
+
+      <!-- Matriz + decisões -->
+      <section class="row r-1-1">
+        <article class="card" id="secMatriz">
+          <div class="card-head">
+            <div><h2>Matriz de Riscos de TI</h2><p class="sub">Índice = Probabilidade × Impacto · escala 1–5 da aula de 30/09</p></div>
+            <div class="legend" id="legMatriz"></div>
+          </div>
+          <div class="matrix-wrap"><div class="matrix" id="matriz"></div></div>
+          <p class="foot" id="matrizFoot"></p>
+        </article>
+        <article class="card" id="secDecisoes">
+          <div class="card-head">
+            <div><h2>Decisões Prioritárias para a Direção</h2></div>
+            <span class="pill" id="qtdDecisoes"></span>
+          </div>
+          <div id="listaDecisoes" class="decisions"></div>
+        </article>
+      </section>
+
+      <!-- Ficha -->
+      <section class="card" id="secFicha">
+        <details open>
+          <summary><h2>Ficha dos indicadores</h2><span class="sub">valor, meta, fonte, responsável e evidência a validar</span></summary>
+          <div class="table-wrap"><table class="tbl" id="tabFicha"></table></div>
+        </details>
+      </section>
+
+      <footer class="footer">
+        <span>Prefeitura de Boa Esperança · Coordenação de TI · CSTSI6 · Gabriel Nogueira, Miguel Bardales, Gabriel Diógenes</span>
+        <span>Protótipo experimental · Dados hipotéticos sem validade oficial · <a id="linkPlanilha" target="_blank" rel="noopener">Ver planilha</a></span>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- Tooltip e modais -->
+<div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+
+<dialog class="modal" id="dlgConfig">
+  <form method="dialog">
+    <h3>Configurações</h3>
+    <label class="fld">Fonte de dados (API)<input id="cfgApi" readonly></label>
+    <label class="fld">Atualização automática
+      <select id="cfgIntervalo">
+        <option value="0">Desligada</option><option value="30">A cada 30 s</option>
+        <option value="60">A cada 1 min</option><option value="300">A cada 5 min</option>
+      </select>
+    </label>
+    <label class="fld">Tema
+      <select id="cfgTema"><option value="dark">Escuro</option><option value="light">Claro</option></select>
+    </label>
+    <p class="hint">A URL da API é definida em <code>assets/js/config.js</code>.</p>
+    <div class="modal-actions"><button class="btn-primary" value="ok">Fechar</button></div>
+  </form>
+</dialog>
+
+<dialog class="modal" id="dlgAjuda">
+  <form method="dialog">
+    <h3>Como ler o painel</h3>
+    <p><b>Situação de cada indicador</b> (mesma regra do PDF e do Power BI):</p>
+    <ul>
+      <li><span class="chip st-sem">○ Sem evidência</span> não há valor medido no período.</li>
+      <li><span class="chip st-ok">✔ No alvo</span> a meta foi atingida.</li>
+      <li><span class="chip st-crit">✖ Crítica</span> abaixo da meta e ligado a risco de índice ≥ 13, ou 15% ou mais longe da meta.</li>
+      <li><span class="chip st-warn">▲ Atenção</span> abaixo da meta nos demais casos.</li>
+    </ul>
+    <p><b>Faixas de risco:</b> 1–5 baixo · 6–12 médio · 13–19 alto · 20–25 crítico.</p>
+    <p><b>Dados:</b> vêm da planilha do grupo, via API do Google Apps Script. Valores marcados como simulados ou a validar
+      não representam medição real da Prefeitura. Um valor só justifica investigar; a causa precisa de evidência.</p>
+    <p><b>Atalhos:</b> <kbd>Ctrl</kbd>+<kbd>K</kbd> busca · <kbd>Esc</kbd> limpa a busca.</p>
+    <div class="modal-actions"><button class="btn-primary" value="ok">Entendi</button></div>
+  </form>
+</dialog>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/exemplo.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
