@@ -333,23 +333,57 @@
   };
 
   /** Tenta as fontes na ordem configurada. Devolve { modelo, fonte, nome, json, tentativas }. */
+  const TIPOS = ["indicadores", "medicoes", "riscos", "decisoes", "servicos"];
+  const ESSENCIAIS = ["indicadores", "medicoes", "riscos", "decisoes"];
+  const NOMES_TABELA = { indicadores: "indicadores", medicoes: "medições", riscos: "riscos", decisoes: "decisões", servicos: "serviços" };
+
+  /**
+   * Tenta as fontes na ordem configurada e JUNTA as tabelas: cada tipo de tabela
+   * (indicadores, medições, riscos, decisões) vem da primeira fonte que a tiver.
+   * Assim, se o Apps Script devolver só uma aba, as outras são completadas
+   * pelas fontes seguintes. Devolve { modelo, fontes, nome, origemPorTabela, jsonPorFonte, tentativas }.
+   */
   async function buscar(cfg) {
     const tentativas = [];
+    const partes = {};
+    const origemPorTabela = {};
+    const jsonPorFonte = {};
+    const usadas = [];
     for (const f of cfg.FONTES || ["apps_script"]) {
+      if (ESSENCIAIS.every((k) => partes[k])) break;
       if (!FONTES[f]) { tentativas.push({ fonte: f, erro: "fonte desconhecida" }); continue; }
       try {
         const json = await FONTES[f](cfg);
-        const modelo = interpretar(json, cfg);
-        tentativas.push({ fonte: f, ok: true });
-        return { modelo, fonte: f, nome: NOMES_FONTE[f], json, tentativas };
+        const cls = classificar(coletarTabelas(json));
+        const trouxe = TIPOS.filter((k) => cls[k].length);
+        const novas = trouxe.filter((k) => !partes[k]);
+        novas.forEach((k) => { partes[k] = cls[k]; origemPorTabela[k] = f; });
+        if (novas.length) { usadas.push(f); jsonPorFonte[f] = json; }
+        tentativas.push({
+          fonte: f, nome: NOMES_FONTE[f], ok: true,
+          detalhe: !trouxe.length ? "respondeu, mas sem as colunas esperadas"
+            : novas.length ? `trouxe ${novas.map((k) => NOMES_TABELA[k]).join(", ")}`
+            : "respondeu (tabelas já obtidas antes)",
+        });
       } catch (e) {
         console.warn(`[painel] fonte "${f}" falhou:`, e);
         tentativas.push({ fonte: f, nome: NOMES_FONTE[f], erro: e.message || String(e) });
       }
     }
-    const err = new Error("nenhuma fonte de dados respondeu");
-    err.tentativas = tentativas;
-    throw err;
+    if (!partes.indicadores && !partes.medicoes) {
+      const err = new Error("nenhuma fonte de dados respondeu");
+      err.tentativas = tentativas;
+      throw err;
+    }
+    const cls = Object.fromEntries(TIPOS.map((k) => [k, partes[k] || []]));
+    const faltando = ESSENCIAIS.filter((k) => !partes[k]).map((k) => NOMES_TABELA[k]);
+    return {
+      modelo: montarModelo(cls, cfg),
+      fontes: usadas,
+      fonte: usadas[0],
+      nome: usadas.map((f) => NOMES_FONTE[f]).join(" + "),
+      origemPorTabela, jsonPorFonte, tentativas, faltando,
+    };
   }
 
   function interpretar(json, cfg) {
@@ -359,5 +393,5 @@
     return montarModelo(cls, cfg);
   }
 
-  window.DadosPainel = { buscar, interpretar, avaliar, faixaRisco, numero, chave, NOMES_FONTE };
+  window.DadosPainel = { buscar, interpretar, avaliar, faixaRisco, numero, chave, NOMES_FONTE, NOMES_TABELA };
 })();

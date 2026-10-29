@@ -428,7 +428,7 @@
 
   function listaTentativas(ts) {
     return `<ul class="diag">${(ts || []).map((x) =>
-      `<li>${x.ok ? "✔" : "✖"} <b>${esc(x.nome || x.fonte)}</b>${x.ok ? " — funcionou" : ` — ${esc(x.erro)}`}</li>`).join("")}</ul>`;
+      `<li>${x.ok ? "✔" : "✖"} <b>${esc(x.nome || x.fonte)}</b> — ${esc(x.ok ? x.detalhe || "funcionou" : x.erro)}</li>`).join("")}</ul>`;
   }
 
   async function carregar(manual) {
@@ -442,16 +442,17 @@
       state.tentativas = r.tentativas;
       state.ultimaAtualizacao = new Date();
       const hora = state.ultimaAtualizacao.toLocaleTimeString("pt-BR");
-      if (r.fonte === "json_local") {
-        const quando = r.json && r.json.atualizadoEm ? new Date(r.json.atualizadoEm) : null;
+      const avisos = [];
+      if (r.fontes.includes("json_local")) {
+        const j = r.jsonPorFonte.json_local;
+        const quando = j && j.atualizadoEm ? new Date(j.atualizadoEm) : null;
         const qtxt = quando && !isNaN(quando) ? quando.toLocaleString("pt-BR") : "data não informada";
-        banner(`Lendo a cópia da planilha salva no repositório (gerada em ${esc(qtxt)}). As fontes ao vivo não responderam.
-          <details><summary>Ver diagnóstico</summary>${listaTentativas(r.tentativas)}</details>`, "warn");
-        status(`Arquivo do repositório · lido às ${hora}`, "on");
-      } else {
-        banner("");
-        status(`${r.nome[0].toUpperCase() + r.nome.slice(1)} · atualizado às ${hora}`, "on");
+        const tabs = Object.entries(r.origemPorTabela).filter(([, f]) => f === "json_local").map(([k]) => D.NOMES_TABELA[k]);
+        avisos.push(`Parte dos dados (${esc(tabs.join(", "))}) veio da cópia salva no repositório, gerada em ${esc(qtxt)}.`);
       }
+      if (r.faltando.length) avisos.push(`Nenhuma fonte trouxe: ${esc(r.faltando.join(", "))}.`);
+      banner(avisos.length ? `${avisos.join(" ")}<details><summary>Ver diagnóstico</summary>${listaTentativas(r.tentativas)}</details>` : "", "warn");
+      status(`${r.nome[0].toUpperCase() + r.nome.slice(1)} · atualizado às ${hora}`, "on");
     } catch (err) {
       console.error("[painel] nenhuma fonte respondeu:", err);
       state.tentativas = err.tentativas || [{ fonte: "?", erro: err.message || String(err) }];
