@@ -12,7 +12,10 @@ window.CONFIG = {
        "json_local"         -> data/dados.json no próprio repositório
                                (atualizado pelo GitHub Actions)
      ------------------------------------------------------------------- */
-  FONTES: ["planilha_publicada", "apps_script", "planilha_gviz", "json_local"],
+  FONTES: ["apps_script", "planilha_publicada", "planilha_gviz", "json_local"],
+
+  // Planilha original (link de edição):
+  // https://docs.google.com/spreadsheets/d/1rh2GSU9Vu8YTZM_n1cLzt6Xb6kkBxTUvMEX1o7jH36g/edit
 
   // Link da planilha publicada (Arquivo > Compartilhar > Publicar na Web)
   PLANILHA_PUBLICADA_URL:
@@ -20,13 +23,13 @@ window.CONFIG = {
 
   // ID da planilha (o trecho entre /d/ e /edit no link de edição). Opcional:
   // só é usado pela fonte "planilha_gviz". Ex.: "1AbCdEf...xyz"
-  PLANILHA_ID: "",
+  PLANILHA_ID: "1rh2GSU9Vu8YTZM_n1cLzt6Xb6kkBxTUvMEX1o7jH36g",
   // Abas lidas pela fonte "planilha_gviz" (precisa listar os nomes)
-  ABAS: ["dIndicadores", "fMedicoes", "dRiscos", "dDecisoes", "dServicos"],
+  ABAS: ["dIndicadores", "fMedicoes", "dRiscos", "dDecisoes"],
 
   // Endpoint do Google Apps Script que devolve a planilha em JSON (GET)
   API_URL:
-    "https://script.google.com/macros/s/AKfycbyVpUQ8Wy_Hjz5c6X63F-6H11TLa31LUJDDQ1xwKAFwHIBKdnJuHY1mjq0_FLbPnghTlw/exec",
+    "https://script.google.com/macros/s/AKfycbxYLzkvI6HZfMQUdq3xk2w3AUyBCCTJtk6-JjUl-v901tKw_iXDIeF8FcJlq8Fdjk1Gyg/exec",
 
   // Arquivo gerado pelo GitHub Actions (mesmo domínio do site, sem CORS)
   JSON_LOCAL_URL: "data/dados.json",

@@ -29,7 +29,7 @@ jobs:
 
       - name: Baixar a planilha e gerar data/dados.json
         env:
-          API_URL: "https://script.google.com/macros/s/AKfycbyVpUQ8Wy_Hjz5c6X63F-6H11TLa31LUJDDQ1xwKAFwHIBKdnJuHY1mjq0_FLbPnghTlw/exec"
+          API_URL: "https://script.google.com/macros/s/AKfycbxYLzkvI6HZfMQUdq3xk2w3AUyBCCTJtk6-JjUl-v901tKw_iXDIeF8FcJlq8Fdjk1Gyg/exec"
           PLANILHA_PUBLICADA_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7-JA1SfYMGei5qJcPNDMMGiO5zONhgdJ1YPCWltni253zeRRm-6_b73c8MswSaipsCL9rPORgWbeS/pubhtml"
         run: python scripts/atualizar_dados.py
 

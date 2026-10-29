@@ -302,9 +302,9 @@
       const erros = [];
       await Promise.all((cfg.ABAS || []).map(async (aba) => {
         try {
-          const csv = await obter(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(cfg.PLANILHA_ID)}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(aba)}`, cfg, "txt");
+          const csv = await obter(`https://docs.google.com/spreadsheets/d/${encodeURIComponent(cfg.PLANILHA_ID)}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(aba)}`, cfg, "txt");
           if (/^\s*</.test(csv)) throw new Error("resposta em HTML (compartilhe a planilha: qualquer pessoa com o link pode ver)");
-          const wb = XLSX.read(csv, { type: "string", raw: false });
+          const wb = XLSX.read(csv, { type: "string", raw: true }); // mantém "97,4" como texto; numero() converte
           out[aba] = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
         } catch (e) { erros.push(`${aba}: ${e.message}`); }
       }));
